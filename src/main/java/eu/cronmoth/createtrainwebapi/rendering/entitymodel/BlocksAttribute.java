@@ -1,10 +1,13 @@
 package eu.cronmoth.createtrainwebapi.rendering.entitymodel;
 
 import de.bluecolored.bluenbt.NBTName;
+import lombok.Data;
 
 import java.util.List;
-
+@Data
 public class BlocksAttribute {
     @NBTName("BlockList")
-    List<BlockAttribute> blockList;
+    private List<BlockAttribute> blockList;
+    @NBTName("Palette")
+    private List<PaletteAttribute> palette;
 }

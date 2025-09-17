@@ -9,4 +9,5 @@ import java.util.List;
 public class ContraptionAttribute {
     @NBTName("Blocks")
     private BlocksAttribute blocks ;
+    @NBTName("AssemblyDirection") private String assemblyDirection;
 }

@@ -5,11 +5,14 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.resource.FileResourceManager;
+import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.sse.ServerSentEventConnectionCallback;
 import io.undertow.server.handlers.sse.ServerSentEventHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +67,20 @@ public class ApiServer {
                     }
                 }
         );
+        FileResourceManager resourceManager = new FileResourceManager(new File("bluemap/train_models/"), 100);
+        ResourceHandler resourceHandler = new ResourceHandler(resourceManager)
+                .setDirectoryListingEnabled(false)
+                .setWelcomeFiles("index.html");
 
+        HttpHandler trainModelHandler = new HttpHandler() {
+            @Override
+            public void handleRequest(HttpServerExchange exchange) throws Exception {
+                exchange.getResponseHeaders().put(new HttpString("Access-Control-Allow-Origin"), "*");
+                resourceHandler.handleRequest(exchange);
+            }
+        };
+
+        pathHandler.addPrefixPath("/trainModels", trainModelHandler);
         server = Undertow.builder()
                 .addHttpListener(port, host)
                 .setHandler(pathHandler)
