@@ -45,9 +45,11 @@ public class CreateEntityAddon implements Runnable {
     private void loadTrainModels(BlueMapAPI api) {
         BlueNBT blueNBT = new BlueNBT();
         String workingDir = System.getProperty("user.dir");
+        BlueMapService service = ((BlueMapAPIImpl) api).blueMapService();
 
+        BmMap map = service.getMaps().values().stream().findFirst().orElse(null);
         try (
-                InputStream in = Files.newInputStream(Path.of(workingDir + "/world/data/create_tracks.dat"));
+                InputStream in = Files.newInputStream(Path.of(workingDir + "/"+ map.getWorld().getName() + "/data/create_tracks.dat"));
                 InputStream compressedIn = new BufferedInputStream(new GZIPInputStream(in))
         ) {
             TrainRoot networkData = blueNBT.read(compressedIn, TrainRoot.class);
@@ -66,7 +68,7 @@ public class CreateEntityAddon implements Runnable {
                     entity.setAssemblyDirection(carriage.Entity.Contraption.getAssemblyDirection());
                     entity.setTrain(true);
                     String path = workingDir + "/bluemap/train_models/" + uuid + "_" + i + ".prbm";
-                    saveTrainModel(api, entity, path);
+                    saveTrainModel(map, entity, path);
                     i++;
                 }
             });
@@ -76,10 +78,7 @@ public class CreateEntityAddon implements Runnable {
         }
     }
 
-    private void saveTrainModel(BlueMapAPI api, ContraptionEntity entity, String path) {
-        BlueMapService service = ((BlueMapAPIImpl) api).blueMapService();
-
-        BmMap map = service.getMaps().values().stream().findFirst().orElse(null);
+    private void saveTrainModel(BmMap map, ContraptionEntity entity, String path) {
 
         ResourcePack resourcePack = map.getResourcePack();
         TextureGallery textureGallery = map.getTextureGallery();
@@ -100,7 +99,7 @@ public class CreateEntityAddon implements Runnable {
 
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to write train_model.prbm", e);
+            throw new RuntimeException("Failed to write", e);
         }
     }
 

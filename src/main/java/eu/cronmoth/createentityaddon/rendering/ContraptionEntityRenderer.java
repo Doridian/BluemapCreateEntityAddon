@@ -35,7 +35,7 @@ public class ContraptionEntityRenderer implements EntityRenderer {
 
     @Override
     public void render(Entity entity, BlockNeighborhood block, Part part, TileModelView tileModel) {
-        System.out.println("inside ContraptionEntityRenderer");
+        //System.out.println("inside ContraptionEntityRenderer");
         if (!(entity instanceof ContraptionEntity contraption)) {
             return;
         }
