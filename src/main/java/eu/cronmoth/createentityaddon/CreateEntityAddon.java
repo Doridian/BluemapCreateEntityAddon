@@ -1,4 +1,4 @@
-package eu.cronmoth.createtrainwebapi;
+package eu.cronmoth.createentityaddon;
 
 
 import com.flowpowered.math.vector.Vector3d;
@@ -14,19 +14,15 @@ import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
 import de.bluecolored.bluemap.core.world.mca.entity.EntityType;
 import de.bluecolored.bluenbt.BlueNBT;
-import eu.cronmoth.createtrainwebapi.rendering.ContraptionBlock;
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.ContraptionAttribute;
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createtrainwebapi.rendering.ContraptionEntityRenderer;
-import eu.cronmoth.createtrainwebapi.rendering.trainmodel.Carriage;
-import eu.cronmoth.createtrainwebapi.rendering.trainmodel.TrainRoot;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import eu.cronmoth.createentityaddon.rendering.ContraptionBlock;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionAttribute;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.ContraptionEntityRenderer;
+import eu.cronmoth.createentityaddon.rendering.trainmodel.Carriage;
+import eu.cronmoth.createentityaddon.rendering.trainmodel.TrainRoot;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
-
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -37,7 +33,7 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 
-public class CreateTrainWebAPIMod implements Runnable {
+public class CreateEntityAddon implements Runnable {
     public static final Logger LOGGER = LogUtils.getLogger();
 
 

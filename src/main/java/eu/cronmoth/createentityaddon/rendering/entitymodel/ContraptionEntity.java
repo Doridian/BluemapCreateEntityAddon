@@ -1,4 +1,4 @@
-package eu.cronmoth.createtrainwebapi.rendering.entitymodel;
+package eu.cronmoth.createentityaddon.rendering.entitymodel;
 
 import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector3d;

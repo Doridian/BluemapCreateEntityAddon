@@ -1,6 +1,4 @@
-package eu.cronmoth.createtrainwebapi.rendering.trainmodel;
-
-import eu.cronmoth.createtrainwebapi.rendering.*;
+package eu.cronmoth.createentityaddon.rendering.trainmodel;
 
 import java.util.List;
 

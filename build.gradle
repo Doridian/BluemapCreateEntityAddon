@@ -99,7 +99,7 @@ neoForge {
         // these are used to tell the game which sources are for which mod
         // multi mod projects should define one per mod
         "${mod_id}" {
-            sourceSet(sourceSets.main)
+            //sourceSet(sourceSets.main)
         }
     }
 }

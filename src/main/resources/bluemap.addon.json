@@ -1,5 +1,5 @@
 {
-  "id": "CreateTrainAPI",
-  "entrypoint": "eu.cronmoth.createtrainwebapi.CreateTrainWebAPIMod",
+  "id": "CreateEntityAddon",
+  "entrypoint": "eu.cronmoth.createentityaddon.CreateEntityAddon",
   "version": "${version}"
 }

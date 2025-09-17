@@ -1,4 +1,4 @@
-package eu.cronmoth.createtrainwebapi.rendering.trainmodel;
+package eu.cronmoth.createentityaddon.rendering.trainmodel;
 
 public class TrainRoot {
     public TrainData data;

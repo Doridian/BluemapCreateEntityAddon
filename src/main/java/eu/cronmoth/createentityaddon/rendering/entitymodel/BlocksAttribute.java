@@ -1,4 +1,4 @@
-package eu.cronmoth.createtrainwebapi.rendering.entitymodel;
+package eu.cronmoth.createentityaddon.rendering.entitymodel;
 
 import de.bluecolored.bluenbt.NBTName;
 import lombok.Data;

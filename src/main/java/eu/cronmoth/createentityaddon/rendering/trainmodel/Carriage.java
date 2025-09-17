@@ -1,7 +1,6 @@
-package eu.cronmoth.createtrainwebapi.rendering.trainmodel;
+package eu.cronmoth.createentityaddon.rendering.trainmodel;
 
 
-import java.util.List;
 import java.util.Map;
 
 public class Carriage {

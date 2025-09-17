@@ -1,14 +1,13 @@
-package eu.cronmoth.createtrainwebapi.rendering;
+package eu.cronmoth.createentityaddon.rendering;
 
 import de.bluecolored.bluemap.core.world.BlockEntity;
 import de.bluecolored.bluemap.core.world.BlockState;
 import de.bluecolored.bluemap.core.world.LightData;
 import de.bluecolored.bluemap.core.world.biome.Biome;
 import de.bluecolored.bluemap.core.world.block.BlockAccess;
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.BlockAttribute;
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import lombok.Data;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 

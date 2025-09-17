@@ -1,10 +1,8 @@
-package eu.cronmoth.createtrainwebapi.rendering.trainmodel;
+package eu.cronmoth.createentityaddon.rendering.trainmodel;
 
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.ContraptionAttribute;
-import eu.cronmoth.createtrainwebapi.rendering.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionAttribute;
 
 import java.util.List;
-import java.util.UUID;
 
 public class CarriageEntity {
     public List<Float> Motion;
