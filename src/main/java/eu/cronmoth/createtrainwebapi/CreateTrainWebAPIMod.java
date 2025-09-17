@@ -40,7 +40,6 @@ import java.util.zip.GZIPInputStream;
 public class CreateTrainWebAPIMod implements Runnable {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    ApiServer apiServer = new ApiServer();
 
     private void addBluemapRegistryValues() {
         EntityRendererType.REGISTRY.register(ContraptionEntityRenderer.TYPE);
@@ -136,24 +135,9 @@ public class CreateTrainWebAPIMod implements Runnable {
         return new UUID(high, low);
     }
 
-    @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event) {
-        apiServer.stop();
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) throws Exception {
-        String host = Config.SERVER_HOST.get();
-        int port = Config.SERVER_PORT.get();
-        apiServer.start(host, port);
-    }
-
     @Override
     public void run() {
         addBluemapRegistryValues();
         BlueMapAPI.onEnable(this::loadTrainModels);
-
-        apiServer.start("0.0.0.0", 8080);
     }
 }
