@@ -43,13 +43,16 @@ public class CreateEntityAddon implements Runnable {
     }
 
     private void loadTrainModels(BlueMapAPI api) {
-        BlueNBT blueNBT = new BlueNBT();
         String workingDir = System.getProperty("user.dir");
+        BlueNBT blueNBT = new BlueNBT();
         BlueMapService service = ((BlueMapAPIImpl) api).blueMapService();
-
         BmMap map = service.getMaps().values().stream().findFirst().orElse(null);
+        Path createTrainData = Path.of(workingDir + "/"+ map.getWorld().getName() + "/data/create_tracks.dat");
+        if (!createTrainData.toFile().exists()) {
+            return;
+        }
         try (
-                InputStream in = Files.newInputStream(Path.of(workingDir + "/"+ map.getWorld().getName() + "/data/create_tracks.dat"));
+                InputStream in = Files.newInputStream(createTrainData);
                 InputStream compressedIn = new BufferedInputStream(new GZIPInputStream(in))
         ) {
             TrainRoot networkData = blueNBT.read(compressedIn, TrainRoot.class);

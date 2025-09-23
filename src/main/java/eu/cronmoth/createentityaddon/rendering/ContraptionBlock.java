@@ -7,6 +7,7 @@ import de.bluecolored.bluemap.core.world.biome.Biome;
 import de.bluecolored.bluemap.core.world.block.BlockAccess;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
 import lombok.Data;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +66,11 @@ public class ContraptionBlock implements BlockAccess {
         if (block == null) {
             return BlockState.AIR;
         }
-        return new BlockState(contraption.getContraption().getBlocks().getPalette().get(block.getState()).getName());
+        PaletteAttribute palette = contraption.getContraption().getBlocks().getPalette().get(block.getState());
+        if (palette.getProperties()==null) {
+            return new BlockState(palette.getName());
+        }
+        return new BlockState(palette.getName(), palette.getProperties());
     }
 
     @Override
