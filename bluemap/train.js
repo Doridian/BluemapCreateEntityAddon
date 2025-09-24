@@ -309,7 +309,7 @@ function bezierTangent3(p0, p1, p2, p3, t) {
 }
 
 function orientTrainMesh(mesh, pos, tangent) {
-    mesh.position.set(pos.x, pos.y + 1, pos.z);
+    mesh.position.set(pos.x-0.5, pos.y + 1, pos.z);
 
     const forward = new THREE.Vector3(tangent.x, tangent.y, tangent.z).normalize();
     if (forward.length() < 1e-6) return;
