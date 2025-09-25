@@ -1,4 +1,4 @@
-const host = "https://minecraft.game-analytics.net/ctm/";
+const host = "http://localhost:8080";
 let visibleThroughTerrain = true;
 
 let button;
@@ -309,7 +309,7 @@ function bezierTangent3(p0, p1, p2, p3, t) {
 }
 
 function orientTrainMesh(mesh, pos, tangent) {
-    mesh.position.set(pos.x-0.5, pos.y + 1, pos.z);
+    mesh.position.set(pos.x, pos.y + 1, pos.z);
 
     const forward = new THREE.Vector3(tangent.x, tangent.y, tangent.z).normalize();
     if (forward.length() < 1e-6) return;
@@ -457,6 +457,11 @@ function animateTrains() {
 
             const { pos, tangent } = interpolateCar(carState, now);
             orientTrainMesh(mesh, pos, tangent);
+            const markerGeometry = new THREE.SphereGeometry(0.25, 8, 8); // Small sphere
+            const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
+            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+            marker.position.set(pos.x, pos.y + 3, pos.z);
+            scene.add(marker);
         });
     });
 }
@@ -491,7 +496,7 @@ connectTrainStream();
 renderLoop();
 
 let trainModelCache;
-async function loadTrainModelPRBM(url, materialIndex = 0) {
+async function loadTrainModelPRBM(url, direction) {
     if (trainModelCache.has(url)) return trainModelCache.get(url);
 
     try {
@@ -500,6 +505,13 @@ async function loadTrainModelPRBM(url, materialIndex = 0) {
         const map = bluemap.maps[0];
         const loader = map.hiresTileManager.tileLoader.bufferGeometryLoader;
         const geometry = loader.parse(arrayBuffer);
+        //rotate geometry based on assembly direction
+        rotateGeometryToDirection(geometry, direction);
+        //center geometry on x axis
+        geometry.computeBoundingBox();
+        const bbox = geometry.boundingBox;
+        const offsetX = -0.5 * (bbox.max.x + bbox.min.x);
+        geometry.translate(offsetX, 0, 0);
 
         // Pick material based on PRBM group or just first material
         let mat = map.hiresMaterial;
@@ -511,7 +523,6 @@ async function loadTrainModelPRBM(url, materialIndex = 0) {
                 mat = new THREE.MeshStandardMaterial({ color: 0x3366cc, flatShading: true });
             }
         }
-
         const model = { geometry, material: mat };
         trainModelCache.set(url, model);
     } catch (e) {
@@ -523,8 +534,23 @@ async function getTrainModels(trainsData) {
     const urls = [];
     trainsData.forEach(train => {
         train.cars.forEach((car, carIdx) => {
-            urls.push({ url: `${host}/trainModels/${train.id}_${carIdx}.prbm`, materialIndex: car.materialIndex ?? 0 });
+            urls.push({ url: `${host}/trainModels/${train.id}_${carIdx}.prbm`, direction: car.assemblyDirection ?? "SOUTH" });
         });
     });
-    await Promise.all(urls.map(({ url, materialIndex }) => loadTrainModelPRBM(url, materialIndex)));
+    await Promise.all(urls.map(({ url, direction }) => loadTrainModelPRBM(url, direction)));
+}
+
+function rotateGeometryToDirection(geometry, assemblyDirection, targetDirection = "NORTH") {
+    const directionAngles = {
+        "NORTH": 0,
+        "EAST":  -Math.PI / 2,
+        "SOUTH": -Math.PI,
+        "WEST": Math.PI / 2
+    };
+
+    const currentAngle = directionAngles[assemblyDirection] ?? 0;
+    const targetAngle = directionAngles[targetDirection] ?? 0;
+    const rotationAngle = targetAngle - currentAngle;
+
+    geometry.applyMatrix4(new THREE.Matrix4().makeRotationY(rotationAngle));
 }
