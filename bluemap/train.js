@@ -457,11 +457,6 @@ function animateTrains() {
 
             const { pos, tangent } = interpolateCar(carState, now);
             orientTrainMesh(mesh, pos, tangent);
-            const markerGeometry = new THREE.SphereGeometry(0.25, 8, 8); // Small sphere
-            const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
-            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-            marker.position.set(pos.x, pos.y + 3, pos.z);
-            scene.add(marker);
         });
     });
 }
@@ -507,11 +502,6 @@ async function loadTrainModelPRBM(url, direction) {
         const geometry = loader.parse(arrayBuffer);
         //rotate geometry based on assembly direction
         rotateGeometryToDirection(geometry, direction);
-        //center geometry on x axis
-        geometry.computeBoundingBox();
-        const bbox = geometry.boundingBox;
-        const offsetX = -0.5 * (bbox.max.x + bbox.min.x);
-        geometry.translate(offsetX, 0, 0);
 
         // Pick material based on PRBM group or just first material
         let mat = map.hiresMaterial;
@@ -553,4 +543,16 @@ function rotateGeometryToDirection(geometry, assemblyDirection, targetDirection 
     const rotationAngle = targetAngle - currentAngle;
 
     geometry.applyMatrix4(new THREE.Matrix4().makeRotationY(rotationAngle));
+        const offsets = {
+        "NORTH": { x: -0.5, y: 0, z: -1.5 },
+        "EAST":  { x: -0.5, y: 0, z: -0.5 },
+        "SOUTH": { x: 0.5, y: 0, z: -0.5 },
+        "WEST":  { x: 0.5, y: 0, z: -1.5 }
+    };
+
+    const offset = offsets[assemblyDirection] ?? { x: 0, y: 0, z: 0 };
+
+    geometry.applyMatrix4(
+        new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z)
+    );
 }
