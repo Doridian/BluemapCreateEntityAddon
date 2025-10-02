@@ -259,7 +259,8 @@ function findEdge(nodeA, nodeB) {
         (e.node1 === nodeB.id && e.node2 === nodeA.id)
     );
 }
-function getTangentOnEdge(nodeA, nodeB, positionOnTrack, edge) {
+
+function getPositionOnEdge(nodeA, nodeB, positionOnTrack, edge) {
     const p1 = nodeA.dimensionLocationData.location;
     const p2 = nodeB.dimensionLocationData.location;
     if (edge && edge.bezierConnection) {
@@ -270,8 +271,7 @@ function getTangentOnEdge(nodeA, nodeB, positionOnTrack, edge) {
         const totalDist = approximateBezierLength(p0, p1, p2, p3);
         const t = Math.max(0, Math.min(1, (positionOnTrack || 0) / (totalDist || 1)));
         const pt = reversed ? bezier3(p3, p2, p1, p0, t) : bezier3(p0, p1, p2, p3, t);
-        const tangent = reversed ? bezierTangent3(p3, p2, p1, p0, t) : bezierTangent3(p0, p1, p2, p3, t);
-        return { pos: pt, tangent: tangent };
+        return pt;
     }
     const lineLength = Math.sqrt(
         (p2.x - p1.x) ** 2 +
@@ -284,12 +284,7 @@ function getTangentOnEdge(nodeA, nodeB, positionOnTrack, edge) {
         y: p1.y + (p2.y - p1.y) * t,
         z: p1.z + (p2.z - p1.z) * t
     };
-    const tangent = {
-        x: p2.x - p1.x,
-        y: p2.y - p1.y,
-        z: p2.z - p1.z
-    };
-    return { pos, tangent };
+    return pos;
 }
 function bezier3(p0, p1, p2, p3, t) {
     const u = 1 - t;
@@ -331,24 +326,47 @@ function orientTrainMesh(mesh, pos, tangent) {
     mesh.quaternion.setFromRotationMatrix(m);
 }
 
-
-
 function interpolateCar(carState, now) {
-    if (!carState) return { pos: { x: 0, y: 0, z: 0 }, tangent: { x: 1, y: 0, z: 0 } };
-    const { startPos, endPos, startTangent, endTangent, startTime, endTime } = carState;
-    if (!startPos || !endPos || !startTangent || !endTangent) return { pos: endPos || { x: 0, y: 0, z: 0 }, tangent: endTangent || { x: 1, y: 0, z: 0 } };
+    if (!carState) return {
+        front: { pos: { x: 0, y: 0, z: 0 }, tangent: { x: 1, y: 0, z: 0 } },
+        back: { pos: { x: 0, y: 0, z: 0 }, tangent: { x: 1, y: 0, z: 0 } }
+    };
+
+    const {
+        startFront, endFront,
+        startBack, endBack,
+        startTime, endTime
+    } = carState;
+
+    if (!startFront || !endFront || !startBack || !endBack) {
+        return {
+            front: { pos: endFront || { x: 0, y: 0, z: 0 }, tangent: { x: 1, y: 0, z: 0 } },
+            back: { pos: endBack || { x: 0, y: 0, z: 0 }, tangent: { x: 1, y: 0, z: 0 } }
+        };
+    }
+
     const t = Math.min(1, (now - startTime) / (endTime - startTime));
-    const pos = {
-        x: startPos.x + (endPos.x - startPos.x) * t,
-        y: startPos.y + (endPos.y - startPos.y) * t,
-        z: startPos.z + (endPos.z - startPos.z) * t
+
+    const frontPos = {
+        x: startFront.x + (endFront.x - startFront.x) * t,
+        y: startFront.y + (endFront.y - startFront.y) * t,
+        z: startFront.z + (endFront.z - startFront.z) * t
     };
+    const backPos = {
+        x: startBack.x + (endBack.x - startBack.x) * t,
+        y: startBack.y + (endBack.y - startBack.y) * t,
+        z: startBack.z + (endBack.z - startBack.z) * t
+    };
+
     const tangent = {
-        x: startTangent.x + (endTangent.x - startTangent.x) * t,
-        y: startTangent.y + (endTangent.y - startTangent.y) * t,
-        z: startTangent.z + (endTangent.z - startTangent.z) * t
+        x: frontPos.x - backPos.x,
+        y: frontPos.y - backPos.y,
+        z: frontPos.z - backPos.z
     };
-    return { pos, tangent };
+
+    return {
+        pos: frontPos, tangent
+    };
 }
 
 function connectTrainStream() {
@@ -365,6 +383,7 @@ function connectTrainStream() {
         console.error("SSE error:", err);
     };
 }
+
 function updateTrainStates() {
     if (!networkData) return;
     const now = performance.now();
@@ -377,24 +396,47 @@ function updateTrainStates() {
         const stateCars = [];
 
         train.cars.forEach((car, carIdx) => {
-            const nodeA = nodeMap.get(car.node1.id ?? car.node1);
-            const nodeB = nodeMap.get(car.node2.id ?? car.node2);
+            // --- Leading point (front of car) ---
+            const nodeA = nodeMap.get(car.node1);
+            const nodeB = nodeMap.get(car.node2);
             if (!nodeA || !nodeB) return;
-            const edge = findEdge(nodeA, nodeB);
-            const { pos, tangent } = getTangentOnEdge(nodeA, nodeB, car.positionOnTrack, edge);
+            const edgeFront = findEdge(nodeA, nodeB);
+            const frontPos = getPositionOnEdge(
+                nodeA, nodeB, car.positionOnTrack, edgeFront
+            );
 
+            // --- Trailing point (back of car) ---
+            const nodeC = nodeMap.get(car.node3);
+            const nodeD = nodeMap.get(car.node4);
+            if (!nodeC || !nodeD) return;
+            const edgeBack = findEdge(nodeC, nodeD);
+            const backPos = getPositionOnEdge(
+                nodeC, nodeD, car.trailingPositionOnTrack, edgeBack
+            );
+
+            // Handle interpolation with previous frame
             const prev = prevTrain.cars[carIdx];
-            let startPos = pos, endPos = pos, startTangent = tangent, endTangent = tangent, startTime = now, endTime = now;
+            let startFront = frontPos;
+            let endFront = frontPos;
+            let startBack = backPos;
+            let endBack = backPos;
+            let startTime = now;
+            let endTime = now;
+
             if (prev && prev.dimension === nodeA.dimensionLocationData.dimension) {
-                startPos = prev.endPos || pos;
-                endPos = pos;
-                startTangent = prev.endTangent || tangent;
-                endTangent = tangent;
+                startFront = prev.endFront || frontPos;
+                endFront = frontPos;
+
+                startBack = prev.endBack || backPos;
+                endBack = backPos;
+
                 startTime = now;
                 endTime = now + 200;
             }
+
             stateCars.push({
-                startPos, endPos, startTangent, endTangent,
+                startFront, endFront,
+                startBack, endBack,
                 startTime, endTime,
                 dimension: nodeA.dimensionLocationData.dimension
             });
@@ -405,6 +447,8 @@ function updateTrainStates() {
 
     renderTrains();
 }
+
+
 function renderTrains() {
     objects.trains.forEach(obj => scene.remove(obj));
     objects.trains.clear();
@@ -556,3 +600,8 @@ function rotateGeometryToDirection(geometry, assemblyDirection, targetDirection 
         new THREE.Matrix4().makeTranslation(offset.x, offset.y, offset.z)
     );
 }
+
+Object.defineProperty(bluemap.mapViewer, "lastRedrawChange", {
+    get: () => Date.now(),
+    set: () => {},
+});
