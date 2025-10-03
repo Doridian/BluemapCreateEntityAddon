@@ -6,7 +6,6 @@ import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.Entity;
 import de.bluecolored.bluenbt.NBTName;
 import lombok.Data;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +21,6 @@ public class ContraptionEntity implements Entity {
     private @NBTName("Rotation") Vector2f rotation;
     private @NBTName("Contraption") ContraptionAttribute contraption;
     private @NBTName("AssemblyDirection") String assemblyDirection;
-    private Map<Vec3, BlockAttribute> blocks;
+    private Map<Vector3d, BlockAttribute> blocks;
     private boolean isTrain;
 }

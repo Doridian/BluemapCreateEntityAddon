@@ -16,7 +16,6 @@ import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +47,7 @@ public class ContraptionEntityRenderer implements EntityRenderer {
 //                rotateBlock(paletteAttribute, contraption.getContraption().getAssemblyDirection());
 //            }
         }
-        Map<Vec3, BlockAttribute> blocks = new HashMap<>();
+        Map<Vector3d, BlockAttribute> blocks = new HashMap<>();
         for (BlockAttribute nbtBlock : contraption.getContraption().getBlocks().getBlockList()) {
             long[] coords = unpackCoordinates(nbtBlock.getPosition());
             if (contraption.isTrain()) {
@@ -59,8 +58,8 @@ public class ContraptionEntityRenderer implements EntityRenderer {
             double y = coords[1] + contraption.getPos().getY();
             double z = coords[2] + contraption.getPos().getZ();
 
-            nbtBlock.setRelativePosition(new Vec3(coords[0], coords[1], coords[2]));
-            Vec3 key = new Vec3(x,y,z);
+            nbtBlock.setRelativePosition(new Vector3d(coords[0], coords[1], coords[2]));
+            Vector3d key = new Vector3d(x,y,z);
             blocks.put(key, nbtBlock);
             nbtBlock.setCoords(key);
         }
@@ -72,8 +71,8 @@ public class ContraptionEntityRenderer implements EntityRenderer {
             tileModel.initialize();
             BlockNeighborhood neighborhood = new BlockNeighborhood(blockAccess, resourcePack, renderSettings,block.getDimensionType());
             blockRenderer.render(neighborhood, tileModel, new Color());
-            Vec3 relativePos = nbtBlock.getRelativePosition();
-            tileModel.translate((int)relativePos.x, (int)relativePos.y, (int)relativePos.z);
+            Vector3d relativePos = nbtBlock.getRelativePosition();
+            tileModel.translate((int)relativePos.getX(), (int)relativePos.getY(), (int)relativePos.getZ());
         }
     }
 

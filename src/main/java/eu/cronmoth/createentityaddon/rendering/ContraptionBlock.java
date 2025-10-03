@@ -1,5 +1,6 @@
 package eu.cronmoth.createentityaddon.rendering;
 
+import com.flowpowered.math.vector.Vector3d;
 import de.bluecolored.bluemap.core.world.BlockEntity;
 import de.bluecolored.bluemap.core.world.BlockState;
 import de.bluecolored.bluemap.core.world.LightData;
@@ -9,7 +10,6 @@ import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
 import lombok.Data;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 @Data
@@ -59,10 +59,10 @@ public class ContraptionBlock implements BlockAccess {
 
     @Override
     public BlockState getBlockState() {
-        double x = this.block.getCoords().x+this.x;
-        double y = this.block.getCoords().y+this.y;
-        double z = this.block.getCoords().z+this.z;
-        BlockAttribute block = contraption.getBlocks().get(new Vec3(x,y,z));
+        double x = this.block.getCoords().getX()+this.x;
+        double y = this.block.getCoords().getY()+this.y;
+        double z = this.block.getCoords().getZ()+this.z;
+        BlockAttribute block = contraption.getBlocks().get(new Vector3d(x,y,z));
         if (block == null) {
             return BlockState.AIR;
         }
