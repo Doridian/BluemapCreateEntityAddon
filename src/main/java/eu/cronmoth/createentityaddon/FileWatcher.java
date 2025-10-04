@@ -1,9 +1,6 @@
 package eu.cronmoth.createentityaddon;
 
 import com.flowpowered.math.vector.Vector3d;
-import de.bluecolored.bluemap.api.BlueMapAPI;
-import de.bluecolored.bluemap.common.BlueMapService;
-import de.bluecolored.bluemap.common.api.BlueMapAPIImpl;
 import de.bluecolored.bluemap.core.map.BmMap;
 import de.bluecolored.bluemap.core.map.TextureGallery;
 import de.bluecolored.bluemap.core.map.hires.ArrayTileModel;
@@ -19,7 +16,6 @@ import eu.cronmoth.createentityaddon.rendering.ContraptionEntityRenderer;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.trainmodel.Carriage;
-import eu.cronmoth.createentityaddon.rendering.trainmodel.Train;
 import eu.cronmoth.createentityaddon.rendering.trainmodel.TrainRoot;
 
 import java.io.*;
@@ -182,7 +178,6 @@ public class FileWatcher extends Thread {
         }
         bb.flip();
 
-        // Extract two longs (UUID is two 64-bit values)
         long high = bb.getLong();
         long low = bb.getLong();
 

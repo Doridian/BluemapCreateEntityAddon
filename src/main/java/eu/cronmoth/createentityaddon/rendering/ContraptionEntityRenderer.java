@@ -15,10 +15,8 @@ import de.bluecolored.bluemap.core.world.Entity;
 import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ContraptionEntityRenderer implements EntityRenderer {
@@ -36,23 +34,15 @@ public class ContraptionEntityRenderer implements EntityRenderer {
 
     @Override
     public void render(Entity entity, BlockNeighborhood block, Part part, TileModelView tileModel) {
-        //System.out.println("inside ContraptionEntityRenderer");
         if (!(entity instanceof ContraptionEntity contraption)) {
             return;
         }
         if (contraption.isTrain()) {
             contraption.setPos(new Vector3d(0, 0, 0));
-//            contraption.getContraption().getBlocks().getPalette();
-//            for(PaletteAttribute paletteAttribute : contraption.getContraption().getBlocks().getPalette()) {
-//                rotateBlock(paletteAttribute, contraption.getContraption().getAssemblyDirection());
-//            }
         }
         Map<Vector3d, BlockAttribute> blocks = new HashMap<>();
         for (BlockAttribute nbtBlock : contraption.getContraption().getBlocks().getBlockList()) {
             long[] coords = unpackCoordinates(nbtBlock.getPosition());
-            if (contraption.isTrain()) {
-//                coords = rotateCoordinates(coords, contraption.getContraption().getAssemblyDirection());
-            }
 
             double x = coords[0] + contraption.getPos().getX();
             double y = coords[1] + contraption.getPos().getY();
@@ -67,31 +57,12 @@ public class ContraptionEntityRenderer implements EntityRenderer {
         for (BlockAttribute nbtBlock : contraption.getContraption().getBlocks().getBlockList()) {
             ContraptionBlock blockAccess = new ContraptionBlock(contraption);
             blockAccess.setBlock(nbtBlock);
-            //blockAccess.set((int)nbtBlock.getCoords().x, (int)nbtBlock.getCoords().y, (int)nbtBlock.getCoords().z);
             tileModel.initialize();
             BlockNeighborhood neighborhood = new BlockNeighborhood(blockAccess, resourcePack, renderSettings,block.getDimensionType());
             blockRenderer.render(neighborhood, tileModel, new Color());
             Vector3d relativePos = nbtBlock.getRelativePosition();
             tileModel.translate((int)relativePos.getX(), (int)relativePos.getY(), (int)relativePos.getZ());
         }
-    }
-
-    private long[] rotateCoordinates(long [] coordinates, String direction) {
-        long x = coordinates[0];
-        long y = coordinates[1];
-        long z = coordinates[2];
-        return switch (direction.toLowerCase()) {
-            case "north" -> new long[]{x, y, z};
-            case "south" -> new long[]{-x, y, -z};
-            case "west" -> new long[]{-z, y, x};
-            case "east" -> new long[]{z, y,-x};
-            default -> new long[]{x, y, z};
-        };
-    }
-
-    private void rotateBlock(PaletteAttribute paletteAttribute, String direction) {
-        if (paletteAttribute.getProperties() == null) return;
-        Map<String, String> props = paletteAttribute.getProperties();
     }
 
     private long[] unpackCoordinates(long pos)
