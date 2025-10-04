@@ -13,6 +13,7 @@ import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.util.math.Color;
 import de.bluecolored.bluemap.core.world.Entity;
 import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
+import de.bluecolored.bluemap.core.world.block.ExtendedBlock;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
@@ -67,9 +68,8 @@ public class ContraptionEntityRenderer implements EntityRenderer {
         for (BlockAttribute nbtBlock : contraption.getContraption().getBlocks().getBlockList()) {
             ContraptionBlock blockAccess = new ContraptionBlock(contraption);
             blockAccess.setBlock(nbtBlock);
-            //blockAccess.set((int)nbtBlock.getCoords().x, (int)nbtBlock.getCoords().y, (int)nbtBlock.getCoords().z);
             tileModel.initialize();
-            BlockNeighborhood neighborhood = new BlockNeighborhood(blockAccess, resourcePack, renderSettings,block.getDimensionType());
+            BlockNeighborhood neighborhood = new ContraptionBlockNeighborhood(blockAccess, resourcePack, renderSettings,block.getDimensionType());
             blockRenderer.render(neighborhood, tileModel, new Color());
             Vector3d relativePos = nbtBlock.getRelativePosition();
             tileModel.translate((int)relativePos.getX(), (int)relativePos.getY(), (int)relativePos.getZ());
