@@ -140,7 +140,7 @@ public class FileWatcher extends Thread {
                         entity.setAssemblyDirection(carriage.Entity.Contraption.getAssemblyDirection());
                         entity.setTrain(true);
 
-                        saveTrainModel(map, entity, outFile.getAbsolutePath());
+                        saveTrainModel(entity, outFile.getAbsolutePath());
                     }
                     i++;
                 }
@@ -151,7 +151,7 @@ public class FileWatcher extends Thread {
     }
 
 
-    private void saveTrainModel(BmMap map, ContraptionEntity entity, String path) {
+    private void saveTrainModel(ContraptionEntity entity, String path) {
         ResourcePack resourcePack = map.getResourcePack();
         TextureGallery textureGallery = map.getTextureGallery();
         RenderSettings renderSettings = map.getMapSettings();

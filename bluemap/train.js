@@ -95,7 +95,7 @@ let lastTrainState = new Map();
 function getCurrentWorldKey() {
     const mapName = mapViewer.map.data.name;
     const m = /\((?<name>.*)\)/.exec(mapName);
-    return m ? m.groups.name : mapName;
+    return m ? m.groups.name.toLowerCase() : mapName.toLowerCase();
 }
 function getNodeMap(dimKey) {
     if (!networkData) return new Map();

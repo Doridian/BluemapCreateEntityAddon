@@ -7,6 +7,7 @@ import de.bluecolored.bluemap.core.map.BmMap;
 import de.bluecolored.bluemap.core.map.hires.entity.EntityRendererType;
 import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.DimensionType;
+import de.bluecolored.bluemap.core.world.mca.MCAWorld;
 import de.bluecolored.bluemap.core.world.mca.entity.EntityType;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.ContraptionEntityRenderer;
@@ -31,13 +32,12 @@ public class CreateEntityAddon implements Runnable {
         fileWatchers = new ArrayList<>();
         BlueMapAPI.onEnable(api ->
         {
-            String workingDir = System.getProperty("user.dir");
             BlueMapService service = ((BlueMapAPIImpl) api).blueMapService();
             for (BmMap map : service.getMaps().values()) {
-                File dataDirectory = new File(workingDir + "/"+ map.getWorld().getName() + "/data");
-                DimensionType dim = map.getWorld().getDimensionType();
-                if (dataDirectory.exists() && dim.isNatural() && dim.hasSkylight() && !dim.hasCeiling()) {
-                    FileWatcher fileWatcher = new FileWatcher(new File(workingDir + "/"+ map.getWorld().getName() + "/data/create_tracks.dat"), map);
+                MCAWorld world = (MCAWorld) map.getWorld();
+                File dataDirectory = new File(world.getWorldFolder() + "/data");
+                if (dataDirectory.exists() && world.getDimension().getKey().getValue().equalsIgnoreCase("overworld")) {
+                    FileWatcher fileWatcher = new FileWatcher(new File(world.getWorldFolder() + "/data/create_tracks.dat"), map);
                     fileWatcher.start();
                     fileWatchers.add(fileWatcher);
                 }
