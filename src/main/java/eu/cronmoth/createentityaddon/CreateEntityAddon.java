@@ -6,7 +6,6 @@ import de.bluecolored.bluemap.common.api.BlueMapAPIImpl;
 import de.bluecolored.bluemap.core.map.BmMap;
 import de.bluecolored.bluemap.core.map.hires.entity.EntityRendererType;
 import de.bluecolored.bluemap.core.util.Key;
-import de.bluecolored.bluemap.core.world.DimensionType;
 import de.bluecolored.bluemap.core.world.mca.MCAWorld;
 import de.bluecolored.bluemap.core.world.mca.entity.EntityType;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
