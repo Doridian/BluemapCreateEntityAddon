@@ -4,12 +4,17 @@ import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.common.BlueMapService;
 import de.bluecolored.bluemap.common.api.BlueMapAPIImpl;
 import de.bluecolored.bluemap.core.map.BmMap;
+import de.bluecolored.bluemap.core.map.hires.block.BlockRendererType;
 import de.bluecolored.bluemap.core.map.hires.entity.EntityRendererType;
 import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.mca.MCAWorld;
+import de.bluecolored.bluemap.core.world.mca.blockentity.BlockEntityType;
 import de.bluecolored.bluemap.core.world.mca.entity.EntityType;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.ContraptionEntityRenderer;
+import eu.cronmoth.createentityaddon.rendering.copycats.CopycatBlockType;
+import eu.cronmoth.createentityaddon.rendering.copycats.entitymodel.CopycatBlockEntity;
+import eu.cronmoth.createentityaddon.rendering.copycats.CopycatRenderer;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.contraptions.ContraptionEntityRenderer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,6 +28,9 @@ public class CreateEntityAddon implements Runnable {
     private void addBluemapRegistryValues() {
         EntityRendererType.REGISTRY.register(ContraptionEntityRenderer.TYPE);
         EntityType.REGISTRY.register(new EntityType.Impl(new Key("create", "stationary_contraption"), ContraptionEntity.class));
+        BlockRendererType.REGISTRY.register(CopycatRenderer.TYPE);
+        BlockRendererType.REGISTRY.register(CopycatRenderer.TYPE);
+        BlockEntityType.REGISTRY.register(new CopycatBlockType.Impl(new Key("create", "copycat"), CopycatBlockEntity.class));
     }
 
     @Override

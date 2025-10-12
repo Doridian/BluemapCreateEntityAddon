@@ -1,6 +1,6 @@
-package eu.cronmoth.createentityaddon.rendering.trainmodel;
+package eu.cronmoth.createentityaddon.rendering.contraptions.trainmodel;
 
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionAttribute;
 
 import java.util.List;
 

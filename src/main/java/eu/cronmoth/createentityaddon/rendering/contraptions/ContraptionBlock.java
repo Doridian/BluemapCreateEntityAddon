@@ -1,4 +1,4 @@
-package eu.cronmoth.createentityaddon.rendering;
+package eu.cronmoth.createentityaddon.rendering.contraptions;
 
 import com.flowpowered.math.vector.Vector3d;
 import de.bluecolored.bluemap.core.world.BlockEntity;
@@ -6,9 +6,9 @@ import de.bluecolored.bluemap.core.world.BlockState;
 import de.bluecolored.bluemap.core.world.LightData;
 import de.bluecolored.bluemap.core.world.biome.Biome;
 import de.bluecolored.bluemap.core.world.block.BlockAccess;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.BlockAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.PaletteAttribute;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
