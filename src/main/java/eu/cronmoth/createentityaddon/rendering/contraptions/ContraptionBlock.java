@@ -70,6 +70,9 @@ public class ContraptionBlock implements BlockAccess {
         if (palette.getProperties()==null) {
             return new BlockState(palette.getName());
         }
+        if (palette.getName().contains("copycat")) {
+            palette.getProperties().put("copycat", "true");
+        }
         return new BlockState(palette.getName(), palette.getProperties());
     }
 

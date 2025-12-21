@@ -61,6 +61,7 @@ public class CopycatRenderer implements BlockRenderer {
     private TileModelView blockModel;
     private Color blockColor;
     private float blockColorOpacity;
+    private final MatrixM4f elementTransform = new MatrixM4f();
 
     public CopycatRenderer(ResourcePack resourcePack, TextureGallery textureGallery, RenderSettings renderSettings) {
         this.resourcePack = resourcePack;
@@ -84,17 +85,20 @@ public class CopycatRenderer implements BlockRenderer {
         if (!(block.getBlockEntity() instanceof CopycatBlockEntity entity)) return;
         if (modelResource == null) return;
 
+        String half = block.getBlockState().getProperties().get("half"); //bottom or top
+        String facing = block.getBlockState().getProperties().get("facing"); //NORTH/SOUTH...
         String[] name = entity.getMaterial().getName().split(":");
         Model copiedModel = resourcePack.getModel(new ResourcePath<>("block/" + name[1]));
-        if (copiedModel == null) return;
+
 
         tintColor.set(0, 0, 0, -1, true);
 
         int modelStart = blockModel.getStart();
+
         Element[] elements = modelResource.getElements();
         if (elements != null) {
             for (Element element : elements) {
-                buildModelElement(element, blockModel.initialize(), copiedModel);
+                buildModelElement(element, blockModel.initialize(), copiedModel, half, facing);
             }
         }
 
@@ -102,14 +106,11 @@ public class CopycatRenderer implements BlockRenderer {
             color.flatten().straight();
             color.a = blockColorOpacity;
         }
-
         blockModel.initialize(modelStart);
         if (variant.isTransformed()) blockModel.transform(variant.getTransformMatrix());
     }
 
-    private final MatrixM4f elementTransform = new MatrixM4f();
-
-    private void buildModelElement(Element element, TileModelView model, Model copiedModel) {
+    private void buildModelElement(Element element, TileModelView model, Model copiedModel, String half, String facing) {
         Vector3f from = element.getFrom();
         Vector3f to = element.getTo();
 
@@ -120,6 +121,7 @@ public class CopycatRenderer implements BlockRenderer {
         float maxY = Math.max(from.getY(), to.getY());
         float maxZ = Math.max(from.getZ(), to.getZ());
 
+        // Compute cube corners
         VectorM3f[] c = corners;
         c[0].set(minX, minY, minZ);
         c[1].set(minX, minY, maxZ);
@@ -131,6 +133,8 @@ public class CopycatRenderer implements BlockRenderer {
         c[7].set(maxX, maxY, maxZ);
 
         int start = model.getStart();
+
+        // Build faces
         face(element, Direction.DOWN, c[0], c[2], c[3], c[1], copiedModel, minX, minY, minZ, maxX, maxY, maxZ);
         face(element, Direction.UP,   c[5], c[7], c[6], c[4], copiedModel, minX, minY, minZ, maxX, maxY, maxZ);
         face(element, Direction.NORTH,c[2], c[0], c[4], c[6], copiedModel, minX, minY, minZ, maxX, maxY, maxZ);
@@ -139,9 +143,49 @@ public class CopycatRenderer implements BlockRenderer {
         face(element, Direction.EAST, c[3], c[2], c[6], c[7], copiedModel, minX, minY, minZ, maxX, maxY, maxZ);
 
         model.initialize(start);
-        model.transform(elementTransform.copy(element.getRotation().getMatrix())
-                .scale(BLOCK_SCALE, BLOCK_SCALE, BLOCK_SCALE));
+
+        // ---------------------------
+        // Compute final transform
+        // ---------------------------
+
+        // Pixel offsets
+        float offsetX = 0f;
+        float offsetY = 0f;
+        float offsetZ = -4f;
+
+        // Apply half offset (top = 8 pixels in Y)
+        if ("top".equalsIgnoreCase(half)) {
+            offsetY = 8f; // or Z depending on your coordinate system
+        }
+
+        // Start with element's own rotation
+        MatrixM4f transform = elementTransform.copy(element.getRotation().getMatrix());
+
+        // Apply translation in pixels
+        transform.translate(offsetX, offsetY, offsetZ);
+
+        transform.translate(-8f, -8f, -8f);
+
+// 2. Apply rotation around Y axis
+        if (facing != null) {
+            switch(facing.toLowerCase()) {
+                case "north" -> transform.rotate(0f, 0f, 1f, 0f);
+                case "south" -> transform.rotate(180f, 0f, 1f, 0f);
+                case "west"  -> transform.rotate(90f, 0f, 1f, 0f);
+                case "east"  -> transform.rotate(-90f, 0f, 1f, 0f);
+            }
+        }
+
+// 3. Translate back from pivot
+        transform.translate(8f, 8f, 8f);
+
+        // Convert from pixels to block units
+        transform.scale(BLOCK_SCALE, BLOCK_SCALE, BLOCK_SCALE);
+
+        // Apply final transform to TileModelView
+        model.transform(transform);
     }
+
 
     private void face(
             Element element,
