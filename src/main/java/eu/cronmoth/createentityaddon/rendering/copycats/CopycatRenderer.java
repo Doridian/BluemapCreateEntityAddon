@@ -15,6 +15,7 @@ import de.bluecolored.bluemap.core.map.hires.block.BlockRenderer;
 import de.bluecolored.bluemap.core.map.hires.block.BlockRendererType;
 import de.bluecolored.bluemap.core.resources.BlockColorCalculatorFactory;
 import de.bluecolored.bluemap.core.resources.ResourcePath;
+import de.bluecolored.bluemap.core.resources.pack.ResourcePool;
 import de.bluecolored.bluemap.core.resources.pack.resourcepack.ResourcePack;
 import de.bluecolored.bluemap.core.resources.pack.resourcepack.blockstate.Variant;
 import de.bluecolored.bluemap.core.resources.pack.resourcepack.model.Element;
@@ -80,7 +81,8 @@ public class CopycatRenderer implements BlockRenderer {
         this.blockModel = blockModel;
         this.blockColor = color;
         this.blockColorOpacity = 0f;
-        this.modelResource = variant.getModel().getResource(resourcePack::getModel);
+        ResourcePool<Model> models = resourcePack.getModels();
+        this.modelResource = variant.getModel().getResource(models::get);
 
         if (!(block.getBlockEntity() instanceof CopycatBlockEntity entity)) return;
         if (modelResource == null) return;
@@ -88,7 +90,7 @@ public class CopycatRenderer implements BlockRenderer {
         String half = block.getBlockState().getProperties().get("half"); //bottom or top
         String facing = block.getBlockState().getProperties().get("facing"); //NORTH/SOUTH...
         String[] name = entity.getMaterial().getName().split(":");
-        Model copiedModel = resourcePack.getModel(new ResourcePath<>("block/" + name[1]));
+        Model copiedModel = resourcePack.getModels().get(new ResourcePath<>("block/" + name[1]));
 
 
         tintColor.set(0, 0, 0, -1, true);

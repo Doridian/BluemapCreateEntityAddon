@@ -10,11 +10,11 @@ import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.mca.MCAWorld;
 import de.bluecolored.bluemap.core.world.mca.blockentity.BlockEntityType;
 import de.bluecolored.bluemap.core.world.mca.entity.EntityType;
+import eu.cronmoth.createentityaddon.rendering.contraptions.ContraptionEntityRenderer;
 import eu.cronmoth.createentityaddon.rendering.copycats.CopycatBlockType;
 import eu.cronmoth.createentityaddon.rendering.copycats.entitymodel.CopycatBlockEntity;
 import eu.cronmoth.createentityaddon.rendering.copycats.CopycatRenderer;
 import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.contraptions.ContraptionEntityRenderer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ public class CreateEntityAddon implements Runnable {
     List<FileWatcher> fileWatchers;
 
     private void addBluemapRegistryValues() {
+        System.out.println("Loading Bluemap Registry / createaddon");
         EntityRendererType.REGISTRY.register(ContraptionEntityRenderer.TYPE);
         EntityType.REGISTRY.register(new EntityType.Impl(new Key("create", "stationary_contraption"), ContraptionEntity.class));
         BlockRendererType.REGISTRY.register(CopycatRenderer.TYPE);

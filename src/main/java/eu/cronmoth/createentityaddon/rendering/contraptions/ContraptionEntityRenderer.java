@@ -1,4 +1,4 @@
-package eu.cronmoth.createentityaddon.rendering;
+package eu.cronmoth.createentityaddon.rendering.contraptions;
 
 import com.flowpowered.math.vector.Vector3d;
 import de.bluecolored.bluemap.core.map.TextureGallery;
@@ -13,9 +13,6 @@ import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.util.math.Color;
 import de.bluecolored.bluemap.core.world.Entity;
 import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
-import de.bluecolored.bluemap.core.world.block.ExtendedBlock;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
 import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
 
