@@ -11,12 +11,12 @@ import de.bluecolored.bluemap.core.resources.pack.resourcepack.ResourcePack;
 import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
 import de.bluecolored.bluenbt.BlueNBT;
-import eu.cronmoth.createentityaddon.rendering.ContraptionBlock;
-import eu.cronmoth.createentityaddon.rendering.ContraptionEntityRenderer;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionAttribute;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.trainmodel.Carriage;
-import eu.cronmoth.createentityaddon.rendering.trainmodel.TrainRoot;
+import eu.cronmoth.createentityaddon.rendering.contraptions.ContraptionBlock;
+import eu.cronmoth.createentityaddon.rendering.contraptions.ContraptionEntityRenderer;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.contraptions.trainmodel.Carriage;
+import eu.cronmoth.createentityaddon.rendering.contraptions.trainmodel.TrainRoot;
 
 import java.io.*;
 import java.nio.ByteBuffer;

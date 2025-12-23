@@ -7,9 +7,9 @@ import de.bluecolored.bluemap.core.world.BlockState;
 import de.bluecolored.bluemap.core.world.LightData;
 import de.bluecolored.bluemap.core.world.biome.Biome;
 import de.bluecolored.bluemap.core.world.block.BlockAccess;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
-import eu.cronmoth.createentityaddon.rendering.entitymodel.PaletteAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.BlockAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.PaletteAttribute;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,6 +72,10 @@ public class ContraptionBlock implements BlockAccess {
             return new BlockState(new Key(palette.getName()));
         }
         return new BlockState(new Key(palette.getName()), palette.getProperties());
+        if (palette.getName().contains("copycat")) {
+            palette.getProperties().put("copycat", "true");
+        }
+        return new BlockState(palette.getName(), palette.getProperties());
     }
 
     @Override

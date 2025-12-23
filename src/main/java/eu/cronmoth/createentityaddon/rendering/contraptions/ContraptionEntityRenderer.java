@@ -16,6 +16,8 @@ import de.bluecolored.bluemap.core.world.block.BlockNeighborhood;
 import de.bluecolored.bluemap.core.world.block.ExtendedBlock;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.BlockAttribute;
 import eu.cronmoth.createentityaddon.rendering.entitymodel.ContraptionEntity;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.BlockAttribute;
+import eu.cronmoth.createentityaddon.rendering.contraptions.entitymodel.ContraptionEntity;
 
 import java.util.HashMap;
 import java.util.Map;

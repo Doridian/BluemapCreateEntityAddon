@@ -1,4 +1,4 @@
-package eu.cronmoth.createentityaddon.rendering.trainmodel;
+package eu.cronmoth.createentityaddon.rendering.contraptions.trainmodel;
 
 
 import java.util.Map;
