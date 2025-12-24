@@ -58,7 +58,9 @@ public class ContraptionEntityRenderer implements EntityRenderer {
             ContraptionBlock blockAccess = new ContraptionBlock(contraption);
             blockAccess.setBlock(nbtBlock);
             tileModel.initialize();
+
             BlockNeighborhood neighborhood = new BlockNeighborhood(blockAccess, resourcePack, renderSettings,block.getDimensionType());
+            neighborhood.set(0,0,0);
             blockRenderer.render(neighborhood, tileModel, new Color());
             Vector3d relativePos = nbtBlock.getRelativePosition();
             tileModel.translate((int)relativePos.getX(), (int)relativePos.getY(), (int)relativePos.getZ());

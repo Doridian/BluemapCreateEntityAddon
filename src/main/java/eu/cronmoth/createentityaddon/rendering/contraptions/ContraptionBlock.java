@@ -1,6 +1,7 @@
 package eu.cronmoth.createentityaddon.rendering.contraptions;
 
 import com.flowpowered.math.vector.Vector3d;
+import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.world.BlockEntity;
 import de.bluecolored.bluemap.core.world.BlockState;
 import de.bluecolored.bluemap.core.world.LightData;
@@ -75,12 +76,12 @@ public class ContraptionBlock implements BlockAccess {
         }
         PaletteAttribute palette = contraption.getContraption().getBlocks().getPalette().get(block.getState());
         if (palette.getProperties()==null) {
-            return new BlockState(palette.getName());
+            return new BlockState(new Key(palette.getName()));
         }
         if (palette.getName().contains("copycat")) {
             palette.getProperties().put("copycat", "true");
         }
-        return new BlockState(palette.getName(), palette.getProperties());
+        return new BlockState(new Key(palette.getName()), palette.getProperties());
     }
 
     @Override
