@@ -34,6 +34,7 @@ import de.bluecolored.bluemap.core.world.block.ExtendedBlock;
 import eu.cronmoth.createentityaddon.rendering.copycats.entitymodel.CopycatBlockEntity;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -84,12 +85,11 @@ public class CopycatRenderer implements BlockRenderer {
 
         if (!(block.getBlockEntity() instanceof CopycatBlockEntity entity)) return;
         if (modelResource == null) return;
-
         String half = block.getBlockState().getProperties().get("half"); //bottom or top
         String facing = block.getBlockState().getProperties().get("facing"); //NORTH/SOUTH...
         String[] name = entity.getMaterial().getName().split(":");
         Model copiedModel = resourcePack.getModel(new ResourcePath<>("block/" + name[1]));
-
+        if (copiedModel == null) return;
 
         tintColor.set(0, 0, 0, -1, true);
 
@@ -111,6 +111,8 @@ public class CopycatRenderer implements BlockRenderer {
     }
 
     private void buildModelElement(Element element, TileModelView model, Model copiedModel, String half, String facing) {
+        boolean isStep = half!=null;
+
         Vector3f from = element.getFrom();
         Vector3f to = element.getTo();
 
@@ -151,7 +153,7 @@ public class CopycatRenderer implements BlockRenderer {
         // Pixel offsets
         float offsetX = 0f;
         float offsetY = 0f;
-        float offsetZ = -4f;
+        float offsetZ = (isStep) ? -4f: 0f;
 
         // Apply half offset (top = 8 pixels in Y)
         if ("top".equalsIgnoreCase(half)) {
@@ -166,23 +168,44 @@ public class CopycatRenderer implements BlockRenderer {
 
         transform.translate(-8f, -8f, -8f);
 
-// 2. Apply rotation around Y axis
         if (facing != null) {
-            switch(facing.toLowerCase()) {
+            String dir = facing.toLowerCase();
+
+            // Base rotation (vanilla horizontal alignment)
+            switch (dir) {
                 case "north" -> transform.rotate(0f, 0f, 1f, 0f);
                 case "south" -> transform.rotate(180f, 0f, 1f, 0f);
                 case "west"  -> transform.rotate(90f, 0f, 1f, 0f);
                 case "east"  -> transform.rotate(-90f, 0f, 1f, 0f);
             }
+
+            if (!isStep) {
+                switch (dir) {
+                    // Horizontal copycat panels → rotate 90°
+                    case "west" ->
+                            transform.rotate(90f, 0f, 0f, 1f);
+
+                    case "east" ->
+                            transform.rotate(-90f, 0f, 0f, 1f);
+
+                    case "north" ->
+                            transform.rotate(-90f, 1f, 0f, 0f);
+
+                    case "south" ->
+                            transform.rotate(90f, 1f, 0f, 0f);
+
+                    case "down" ->
+                            transform.translate(0f, 13f, 0f);
+
+                    case "up" -> {}
+                }
+            }
         }
 
-// 3. Translate back from pivot
         transform.translate(8f, 8f, 8f);
 
-        // Convert from pixels to block units
         transform.scale(BLOCK_SCALE, BLOCK_SCALE, BLOCK_SCALE);
 
-        // Apply final transform to TileModelView
         model.transform(transform);
     }
 
