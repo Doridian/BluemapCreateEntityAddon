@@ -54,8 +54,6 @@ public class CopycatRenderer implements BlockRenderer {
     private final VectorM3f[] corners = new VectorM3f[8];
     private final VectorM2f[] rawUvs = new VectorM2f[4];
     private final VectorM2f[] uvs = new VectorM2f[4];
-    private final Color tintColor = new Color();
-    private final Color mapColor = new Color();
 
     private BlockNeighborhood block;
     private Variant variant;
@@ -88,12 +86,11 @@ public class CopycatRenderer implements BlockRenderer {
         if (!(block.getBlockEntity() instanceof CopycatBlockEntity entity)) return;
         if (modelResource == null) return;
         String half = block.getBlockState().getProperties().get("half"); //bottom or top
-        String facing = block.getBlockState().getProperties().get("facing"); //NORTH/SOUTH...
+        String facingStr = block.getBlockState().getProperties().get("facing");
+        Direction facing = Direction.fromString(facingStr);
         String[] name = entity.getMaterial().getName().split(":");
-        Model copiedModel = resourcePack.getModels().get(new ResourcePath<>("block/" + name[1]));
+        Model copiedModel = resourcePack.getModels().get(new ResourcePath<>(name[0]+ ":block/" + name[1]));
         if (copiedModel == null) return;
-
-        tintColor.set(0, 0, 0, -1, true);
 
         int modelStart = blockModel.getStart();
 
@@ -112,7 +109,7 @@ public class CopycatRenderer implements BlockRenderer {
         if (variant.isTransformed()) blockModel.transform(variant.getTransformMatrix());
     }
 
-    private void buildModelElement(Element element, TileModelView model, Model copiedModel, String half, String facing) {
+    private void buildModelElement(Element element, TileModelView model, Model copiedModel, String half, Direction facing) {
         boolean isStep = half!=null;
 
         Vector3f from = element.getFrom();
@@ -147,11 +144,6 @@ public class CopycatRenderer implements BlockRenderer {
         face(element, Direction.EAST, c[3], c[2], c[6], c[7], copiedModel, minX, minY, minZ, maxX, maxY, maxZ);
 
         model.initialize(start);
-
-        // ---------------------------
-        // Compute final transform
-        // ---------------------------
-
         // Pixel offsets
         float offsetX = 0f;
         float offsetY = 0f;
@@ -171,35 +163,21 @@ public class CopycatRenderer implements BlockRenderer {
         transform.translate(-8f, -8f, -8f);
 
         if (facing != null) {
-            String dir = facing.toLowerCase();
-
-            // Base rotation (vanilla horizontal alignment)
-            switch (dir) {
-                case "north" -> transform.rotate(0f, 0f, 1f, 0f);
-                case "south" -> transform.rotate(180f, 0f, 1f, 0f);
-                case "west"  -> transform.rotate(90f, 0f, 1f, 0f);
-                case "east"  -> transform.rotate(-90f, 0f, 1f, 0f);
+            switch (facing) {
+                case SOUTH -> transform.rotate(180f, 0f, 1f, 0f);
+                case WEST  -> transform.rotate(90f,  0f, 1f, 0f);
+                case EAST  -> transform.rotate(-90f, 0f, 1f, 0f);
+                default -> {}
             }
 
             if (!isStep) {
-                switch (dir) {
-                    // Horizontal copycat panels → rotate 90°
-                    case "west" ->
-                            transform.rotate(90f, 0f, 0f, 1f);
-
-                    case "east" ->
-                            transform.rotate(-90f, 0f, 0f, 1f);
-
-                    case "north" ->
-                            transform.rotate(-90f, 1f, 0f, 0f);
-
-                    case "south" ->
-                            transform.rotate(90f, 1f, 0f, 0f);
-
-                    case "down" ->
-                            transform.translate(0f, 13f, 0f);
-
-                    case "up" -> {}
+                switch (facing) {
+                    case WEST  -> transform.rotate(90f,  0f, 0f, 1f);
+                    case EAST  -> transform.rotate(-90f, 0f, 0f, 1f);
+                    case NORTH -> transform.rotate(-90f, 1f, 0f, 0f);
+                    case SOUTH -> transform.rotate(90f,  1f, 0f, 0f);
+                    case DOWN  -> transform.translate(0f, 13f, 0f);
+                    default -> {}
                 }
             }
         }
@@ -222,6 +200,12 @@ public class CopycatRenderer implements BlockRenderer {
     ) {
         Face face = element.getFaces().get(dir);
         if (face == null) return;
+        ExtendedBlock facedBlockNeighbor = getRotationRelativeBlock(dir);
+        LightData blockLightData = block.getLightData();
+        LightData facedLightData = facedBlockNeighbor.getLightData();
+
+        int sunLight = Math.max(blockLightData.getSkyLight(), facedLightData.getSkyLight());
+        int blockLight = Math.max(blockLightData.getBlockLight(), facedLightData.getBlockLight());
 
         Optional<Face> mapped = Arrays.stream(copiedModel.getElements())
                 .filter(Objects::nonNull)
@@ -262,25 +246,122 @@ public class CopycatRenderer implements BlockRenderer {
 
         blockModel.initialize();
         blockModel.add(2);
-        TileModel t = blockModel.getTileModel();
+        TileModel tileModel = blockModel.getTileModel();
         int f1 = blockModel.getStart();
         int f2 = f1 + 1;
 
-        t.setPositions(f1, c0.x,c0.y,c0.z, c1.x,c1.y,c1.z, c2.x,c2.y,c2.z);
-        t.setPositions(f2, c0.x,c0.y,c0.z, c2.x,c2.y,c2.z, c3.x,c3.y,c3.z);
+        tileModel.setPositions(f1, c0.x,c0.y,c0.z, c1.x,c1.y,c1.z, c2.x,c2.y,c2.z);
+        tileModel.setPositions(f2, c0.x,c0.y,c0.z, c2.x,c2.y,c2.z, c3.x,c3.y,c3.z);
 
         int tex = textureGallery.get(face.getTexture().getTexturePath(copiedModel.getTextures()::get));
-        t.setMaterialIndex(f1, tex);
-        t.setMaterialIndex(f2, tex);
+        tileModel.setMaterialIndex(f1, tex);
+        tileModel.setMaterialIndex(f2, tex);
 
-        t.setUvs(f1, uvs[0].x,uvs[0].y, uvs[1].x,uvs[1].y, uvs[2].x,uvs[2].y);
-        t.setUvs(f2, uvs[0].x,uvs[0].y, uvs[2].x,uvs[2].y, uvs[3].x,uvs[3].y);
+        tileModel.setUvs(f1, uvs[0].x,uvs[0].y, uvs[1].x,uvs[1].y, uvs[2].x,uvs[2].y);
+        tileModel.setUvs(f2, uvs[0].x,uvs[0].y, uvs[2].x,uvs[2].y, uvs[3].x,uvs[3].y);
 
-        t.setColor(f1,1,1,1);
-        t.setColor(f2,1,1,1);
+        tileModel.setColor(f1,1,1,1);
+        tileModel.setColor(f2,1,1,1);
+
+        // ####### blocklight
+        int emissiveBlockLight = Math.max(blockLight, element.getLightEmission());
+        tileModel.setBlocklight(f1, emissiveBlockLight);
+        tileModel.setBlocklight(f2, emissiveBlockLight);
+
+        // ####### sunlight
+        tileModel.setSunlight(f1, sunLight);
+        tileModel.setSunlight(f2, sunLight);
+
+        // ######## AO
+        float ao0 = 1f, ao1 = 1f, ao2 = 1f, ao3 = 1f;
+        if (modelResource.isAmbientocclusion()){
+            ao0 = testAo(c0, dir);
+            ao1 = testAo(c1, dir);
+            ao2 = testAo(c2, dir);
+            ao3 = testAo(c3, dir);
+        }
+
+        tileModel.setAOs(f1, ao0, ao1, ao2);
+        tileModel.setAOs(f2, ao0, ao2, ao3);
     }
 
     private static float lerp(float a, float b, float t) {
         return a + (b - a) * t;
+    }
+
+/////////////////////////////////////////// copied from ResourceModelRenderer.java
+    private ExtendedBlock getRotationRelativeBlock(Direction direction){
+        return getRotationRelativeBlock(direction.toVector());
+    }
+
+    private ExtendedBlock getRotationRelativeBlock(Vector3i direction){
+        return getRotationRelativeBlock(
+                direction.getX(),
+                direction.getY(),
+                direction.getZ()
+        );
+    }
+
+    private final VectorM3f rotationRelativeBlockDirection = new VectorM3f(0, 0, 0);
+    private ExtendedBlock getRotationRelativeBlock(int dx, int dy, int dz){
+        rotationRelativeBlockDirection.set(dx, dy, dz);
+        makeRotationRelative(rotationRelativeBlockDirection);
+
+        return block.getNeighborBlock(
+                Math.round(rotationRelativeBlockDirection.x),
+                Math.round(rotationRelativeBlockDirection.y),
+                Math.round(rotationRelativeBlockDirection.z)
+        );
+    }
+
+    private void makeRotationRelative(VectorM3f direction){
+        if (variant.isTransformed())
+            direction.rotateAndScale(variant.getTransformMatrix());
+    }
+
+    private float testAo(VectorM3f vertex, Direction dir){
+        Vector3i dirVec = dir.toVector();
+        int occluding = 0;
+
+        int x = 0;
+        if (vertex.x == 16){
+            x = 1;
+        } else if (vertex.x == 0){
+            x = -1;
+        }
+
+        int y = 0;
+        if (vertex.y == 16){
+            y = 1;
+        } else if (vertex.y == 0){
+            y = -1;
+        }
+
+        int z = 0;
+        if (vertex.z == 16){
+            z = 1;
+        } else if (vertex.z == 0){
+            z = -1;
+        }
+
+
+        if (x * dirVec.getX() + y * dirVec.getY() > 0){
+            if (getRotationRelativeBlock(x, y, 0).getProperties().isOccluding()) occluding++;
+        }
+
+        if (x * dirVec.getX() + z * dirVec.getZ() > 0){
+            if (getRotationRelativeBlock(x, 0, z).getProperties().isOccluding()) occluding++;
+        }
+
+        if (y * dirVec.getY() + z * dirVec.getZ() > 0){
+            if (getRotationRelativeBlock(0, y, z).getProperties().isOccluding()) occluding++;
+        }
+
+        if (x * dirVec.getX() + y * dirVec.getY() + z * dirVec.getZ() > 0){
+            if (getRotationRelativeBlock(x, y, z).getProperties().isOccluding()) occluding++;
+        }
+
+        if (occluding > 3) occluding = 3;
+        return  Math.max(0f, Math.min(1f - occluding * 0.25f, 1f));
     }
 }
